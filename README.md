@@ -2,6 +2,7 @@
 
 > Modular, agent-agnostic skills for Claude Code, Codex, Copilot, Cursor, Windsurf, and beyond. Built by Pashov Audit Group [www.pashov.com](https://www.pashov.com/)
 
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-agentskills.io-5B8DEF)](https://agentskills.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![CI](https://github.com/pashov/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/pashov/skills/actions/workflows/ci.yml)
@@ -88,6 +89,8 @@ skills/
     ├── references/      # Docs loaded into context
     └── assets/          # Templates and static files
 ```
+
+Skills follow the [agentskills.io](https://agentskills.io/) open standard.
 
 ---
 
