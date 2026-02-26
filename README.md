@@ -52,6 +52,8 @@ git clone https://github.com/pashov/skills
 /audit path/to/Contract.sol
 ```
 
+Each skill has its own README with all modes, flags, and usage examples — see [skills/audit/README.md](skills/audit/README.md).
+
 ---
 
 ## Contributing
