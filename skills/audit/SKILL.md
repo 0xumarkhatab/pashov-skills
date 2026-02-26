@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Fast, focused security feedback on Solidity code while you develop - before you commit, not after an auditor does. Built for developers, not security researchers. Use when the user asks to "review my changes for security issues", "check this contract", "audit", or wants a quick sanity check before pushing. Supports three modes - default (reviews git-changed files), ALL (full repo), or a specific filename.
+description: Fast, focused security feedback on Solidity code while you develop - before you commit, not after an auditor does. Built for developers. Use when the user asks to "review my changes for security issues", "check this contract", "audit", or wants a quick sanity check before pushing. Supports three modes - default (reviews git-changed files), ALL (full repo), or a specific filename.
 ---
 
 # Smart Contract Security Review
@@ -25,8 +25,8 @@ It defines the disclaimer, severity classification, output format, and ordering 
 
 ## Mode Selection
 
-- **Default** (no arguments): run `git diff HEAD --name-only`, filter for `.sol` files. Stop and say so if there are no changed Solidity files.
-- **ALL**: scan all `.sol` files in the repo (exclude `lib/`, `out/`, `node_modules/`, `.git/`).
+- **Default** (no arguments): run `git diff HEAD --name-only`, filter for `.sol` files. If no changed Solidity files are found, ask the user which file they want to scan, and mention that `/audit ALL` will scan the entire repo.
+- **ALL**: scan all `.sol` files in the repo (exclude `lib/`, `out/`, `node_modules/`, `.git/`, and test files).
 - **`$filename`**: scan that specific file only.
 - **`--max-run-time=N`** (optional, in seconds, default `120`): set the time budget. Use a lower value for a quicker gut-check; use a higher value for a deeper scan. Whatever the budget, always prioritise CRITICAL and HIGH vectors first — if time runs short, those are covered before anything lower.
 - **`--confidence=N`** (optional, default `80`): minimum confidence score (0–100) a finding must reach to be reported. Lower values cast a wider net; higher values report only near-certain issues. Example: `--confidence=70` for a broad sweep, `--confidence=95` for a tight, high-signal report.
@@ -97,6 +97,7 @@ Follow `references/report-formatting.md` exactly. Summary: disclaimer first, the
 
 ## Constraints
 
+- Always skip test files in every mode. Exclude any file whose path contains `test/`, `tests/`, `spec/`, or `__tests__/`, any file matching `*.t.sol`, and any file whose name starts with `Test` or ends with `Test.sol` or `Spec.sol`.
 - Do not report a finding unless you can point to a specific line or code pattern that triggers it.
 - Do not report theoretical issues that are structurally prevented by the codebase (check false-positive signals).
 - Never fabricate findings to appear thorough.
