@@ -47,7 +47,7 @@ If the budget is tight, rely on built-in knowledge of Solidity attack vectors in
 
 ## Confidence Scoring
 
-Every finding that passes the false-positive checks is assigned a confidence score from 0 to 100 before being reported. Findings below the active threshold (default 85) are suppressed — not listed, but counted in the Scope section.
+Every finding is assigned a confidence score from 0 to 100 before being reported. Findings below the active threshold (default 80) are suppressed — not listed, but counted in the Scope section.
 
 **Scoring criteria:**
 
@@ -72,7 +72,6 @@ Do not game the score upward to make a report look thorough. When in doubt, scor
 
 Before scanning, load if present:
 
-- **`assets/false-positives.md`** — per the False Positives section above.
 - **`assets/findings/`** — prior audit reports. Use as context to avoid duplicating known issues. Mark previously known findings as such.
 
 ## Review Process
@@ -80,12 +79,11 @@ Before scanning, load if present:
 For each file in scope:
 
 1. Read the full file.
-2. Scan against all 49 vectors in `references/attack-vectors.md`. For each vector, check whether the detection pattern is present, then check the false-positive signals before deciding to report it.
-3. Check the finding against `false-positives.md` entries. Skip any that match.
-4. Only carry forward findings where the detection pattern matches AND the false-positive conditions do not fully apply.
-5. Assign a confidence score (0–100) per the Confidence Scoring section above.
-6. Suppress findings whose confidence score is below the active threshold (default 85; overridden by `--confidence=N`).
-7. Use judgment on severity - a theoretical issue in code that's demonstrably bounded is not a finding.
+2. Scan against the attack vectors. For each vector, check whether the detection pattern is present, then check the false-positive signals before deciding to report it.
+3. Only carry forward findings where the detection pattern matches AND the false-positive conditions do not fully apply.
+4. Assign a confidence score (0–100) per the Confidence Scoring section above.
+5. Suppress findings whose confidence score is below the active threshold (default 80; overridden by `--confidence=N`).
+6. Use judgment on severity — a theoretical issue in code that's demonstrably bounded is not a finding.
 
 Prioritize findings that are:
 
