@@ -30,6 +30,7 @@ It defines the disclaimer, severity classification, output format, and ordering 
 - **`$filename`**: scan that specific file only.
 - **`--max-run-time=N`** (optional, in seconds, default `120`): set the time budget. Use a lower value for a quicker gut-check; use a higher value for a deeper scan. Whatever the budget, always prioritise CRITICAL and HIGH vectors first — if time runs short, those are covered before anything lower.
 - **`--confidence=N`** (optional, default `80`): minimum confidence score (0–100) a finding must reach to be reported. Lower values cast a wider net; higher values report only near-certain issues. Example: `--confidence=70` for a broad sweep, `--confidence=95` for a tight, high-signal report.
+- **`--reasoning=N`** (optional, default `75`): depth of reasoning to apply (0–100). Low values move faster with lighter analysis; high values think harder, consider more edge cases, and re-examine uncertain findings before reporting. Example: `--reasoning=50` for a quick pass, `--reasoning=100` for maximum scrutiny.
 
 ## Time Budget
 
@@ -97,8 +98,8 @@ Follow `references/report-formatting.md` exactly. Summary: disclaimer first, the
 
 ## Constraints
 
-- Always skip test files in every mode. Exclude any file whose path contains `test/`, `tests/`, `spec/`, or `__tests__/`, any file matching `*.t.sol`, and any file whose name starts with `Test` or ends with `Test.sol` or `Spec.sol`.
 - Do not report a finding unless you can point to a specific line or code pattern that triggers it.
 - Do not report theoretical issues that are structurally prevented by the codebase (check false-positive signals).
 - Never fabricate findings to appear thorough.
 - Do not report INFO findings. Minimum severity is LOW.
+- Always skip test files in every mode. Exclude any file whose path contains `test/`, `tests/`, `spec/`, or `__tests__/`, any file matching `*.t.sol`, and any file whose name starts with `Test` or ends with `Test.sol` or `Spec.sol`.
