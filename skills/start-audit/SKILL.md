@@ -6,6 +6,8 @@ description: This skill helps security researchers and auditors start an in-dept
 # Start Audit
 
 <context>
+## Context
+
 This skill helps security researchers and auditors start an in-depth security review, understand the codebase and get up to speed fast. It builds the project, maps the architecture, traces token flows, documents external integrations, and produces a threat model - all as separate Mermaid-enhanced markdown files ready to hand off to an auditor.
 </context>
 
@@ -139,6 +141,7 @@ Derive scenarios from what the code actually does - don't pad with generic threa
 </instructions>
 
 <output_format>
+## Output Format
 
 After generating all five files, print a summary:
 
@@ -160,6 +163,8 @@ Generated:
 </output_format>
 
 <constraints>
+## Constraints
+
 - Prefer reading actual code over guessing. If you're unsure what a function does, read it.
 - Mermaid diagrams should be accurate, not decorative. Only include nodes and edges that reflect real code relationships.
 - If the repo is large, prioritize core protocol contracts over periphery, scripts, and test helpers.

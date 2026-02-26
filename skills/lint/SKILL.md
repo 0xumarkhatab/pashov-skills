@@ -6,6 +6,8 @@ description: Lints and cleans Solidity code. Use whenever the user says "lint", 
 # Solidity Linter
 
 <context>
+## Context
+
 Cleans up Solidity code by applying formatting, removing dead weight, adding missing documentation, and enforcing community best practices. The goal is code that is readable, consistent, and professional - without changing any logic.
 
 For the detailed rules behind each check, read `references/rules.md`.
@@ -156,6 +158,8 @@ If a function has `@inheritdoc`, do not add other tags.
 </instructions>
 
 <output_format>
+## Output Format
+
 After all passes:
 
 ```
@@ -182,6 +186,8 @@ Changes made: M
 </output_format>
 
 <constraints>
+## Constraints
+
 - Never change logic - only style and documentation
 - Never remove code that looks intentionally kept for storage layout in upgradeable contracts; flag it in the summary with a note instead
 - Respect `// solhint-disable` and `// forge-fmt:off` directives
