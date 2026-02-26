@@ -35,7 +35,7 @@ When `--fast` is set, apply these constraints instead of the default process:
 - **Skip** loading `assets/false-positives.md` and `assets/findings/`.
 - **Check only CRITICAL and HIGH severity vectors.** Do not report MEDIUM, LOW, or INFO.
 - **ALL mode:** cap at the 5 files most recently changed (`git diff HEAD --name-only` order).
-- **Output:** omit the PoC field. Replace with a single sentence: what an attacker does and what they gain.
+- **Output:** follow the standard format from `references/report-formatting.md`.
 
 Focus built-in scanning on the highest-yield vectors: reentrancy (single, cross-function, read-only), missing/incorrect access control, unprotected initializer, oracle spot-price manipulation, flash loan price manipulation, unchecked arithmetic in value flows, msg.value reuse in loop/multicall, delegatecall to user-controlled address, signature replay, ecrecover zero-address, abi.encodePacked hash collision, and price slippage (no min output).
 
@@ -112,5 +112,4 @@ Follow `references/report-formatting.md` exactly. Summary: disclaimer first, the
 - Do not report a finding unless you can point to a specific line or code pattern that triggers it.
 - Do not report theoretical issues that are structurally prevented by the codebase (check false-positive signals).
 - Never fabricate findings to appear thorough.
-- Keep PoC concise - attack scenario, not a full working exploit.
 - Do not report INFO findings. Minimum severity is LOW.

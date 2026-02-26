@@ -42,10 +42,7 @@ Do not report INFO findings.
 ### 1. [CRITICAL] <Title>
 - **Confidence:** N/100
 - **Location:** ContractName.functionName (line N)
-- **Vector:** <vector name from attack-vectors.md>
-- **Issue:** <what is wrong and why it matters>
-- **Impact:** <what an attacker can do>
-- **PoC:** <minimal attack scenario - one paragraph, no full exploit code>
+- **Description:** <vector name — what is wrong and why it matters — what an attacker can do>
 - **Fix:** <concrete code-level recommendation>
 
 ### 2. [HIGH] <Title>
@@ -61,5 +58,4 @@ Below confidence threshold: N
 - Order findings Critical first, then High, Medium, Low within the table and the detail section.
 - Number findings sequentially; the number in the table matches the heading number in the detail section.
 - Omit severity levels that have no findings.
-- In `--fast` mode: omit the PoC field; replace with one sentence — what an attacker does and what they gain.
 - The disclaimer is always printed, even when there are no findings.
