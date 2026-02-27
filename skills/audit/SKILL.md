@@ -97,6 +97,18 @@ For each file in scope:
 5. Suppress findings whose confidence score is below the active threshold (default 80; overridden by `--confidence=N`).
 6. Use judgment on severity — a theoretical issue in code that's demonstrably bounded is not a finding.
 
+## Severity Assignment
+
+After assigning confidence, assign severity per `references/report-formatting.md`. Then apply these downgrade rules before finalizing:
+
+- **Privileged caller required** (owner, admin, multisig, governance) → drop one level.
+- **Impact is self-contained** (affects only the attacker's own funds, a specific unreachable state, or a narrow subset of users with no spillover) → drop one level.
+- **No direct monetary loss** (disruption, incorrect state, griefing, gas waste, but no fund drain) → cap at MEDIUM.
+- **Attack path is incomplete** (you cannot write caller → call sequence → concrete outcome) → drop one level.
+- **When uncertain between two levels** → always choose the lower.
+
+CRITICAL and HIGH are rare. Most findings in production Solidity land at MEDIUM or LOW. If your draft report has more than one CRITICAL or HIGH, re-examine each before finalizing — the bar is a complete, end-to-end exploit with meaningful value at risk and no significant preconditions.
+
 Prioritize findings that are:
 
 - Directly exploitable with a concrete attack path

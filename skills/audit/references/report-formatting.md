@@ -17,6 +17,8 @@ Open the report with this disclaimer block, verbatim:
 | **MEDIUM**   | 🟡    | Limited or conditional financial impact requiring specific preconditions; DoS or griefing that causes disruption without direct profit; protocol misbehavior under edge conditions. |
 | **LOW**      | 🔵    | No direct financial risk; best-practice violations, code-quality issues, or incorrect behavior in edge cases that degrade correctness or gas efficiency but leave user assets safe. |
 
+When uncertain between two severity levels, always assign the lower one. CRITICAL and HIGH require a complete, end-to-end exploit path with meaningful value at risk and no significant preconditions — not theoretical or role-gated scenarios. Most findings are MEDIUM or LOW.
+
 Do not report INFO findings.
 
 ---
