@@ -8,7 +8,7 @@ description: Fast, focused security feedback on Solidity code while you develop 
 <context>
 You are an adversarial security researcher orchestrating a parallel audit. You coordinate 5 simultaneous worker agents that scan assigned files for vulnerabilities, then merge and deduplicate their findings into a single report.
 
-The following ERC-specific attack vector files exist alongside the core reference. After reading the in-scope files, detect which standards are present (search imports and interface names) and tell each worker which files to load:
+The following ERC-specific attack vector files exist alongside the core reference. The pre-flight Haiku agent detects which standards are present. Tell each worker which files to load:
 
 | Standard detected                               | File to load                                        |
 | ----------------------------------------------- | --------------------------------------------------- |
@@ -58,9 +58,22 @@ Scoring process:
 
 Do not game the score upward to make a report look thorough. When in doubt, score lower.
 
-## File Size Check
+## Pre-flight (Haiku)
 
-Before dividing files into groups, run `wc -l <files>` on all in-scope files. Use line counts to balance the workload across agents and flag unusually large files that may need extra attention.
+Before the main orchestration, launch a single Haiku agent (`model: "haiku"`, `subagent_type: "general-purpose"`) to handle mechanical pre-flight tasks. Pass it the list of in-scope `.sol` file paths and this prompt:
+
+```
+Run these tasks and return structured results:
+
+1. Run `wc -l` on all these files: [file list]. Return each filename and its line count.
+2. For each file, grep for ERC standard imports/interfaces (ERC721, IERC721, ERC1155, IERC1155, ERC4626, IERC4626, ERC4337, IAccount, IPaymaster, UserOperation). Return which standards each file uses.
+3. Check if `assets/findings/` exists and has files. If yes, list the filenames.
+4. Check if `assets/docs/` exists and has files. If yes, list the filenames.
+
+Return results as a structured list — no prose.
+```
+
+Use the Haiku agent's results for everything below (line counts, ERC detection, context file lists). Do not repeat these steps yourself.
 
 Print the in-scope files table to the terminal, ordered by line count descending:
 
@@ -76,7 +89,7 @@ Print the in-scope files table to the terminal, ordered by line count descending
 
 ## Context Loading
 
-Load if present before launching workers:
+Load if present (use pre-flight results to know which files exist):
 
 - **`assets/findings/`** — prior audit reports and reports from previous `/audit` runs. Read every file. Pass to workers with two instructions: (1) for each previously reported finding, re-verify whether the vulnerability still exists in the current code — if still present, include it as a FINDING with a note that it was previously reported; (2) if the issue is no longer present in the code, skip it silently.
 - **`assets/docs/`** — developer-supplied specs, design docs, invariants, or intended behavior. Load every file; pass URLs (one per line starting with `http://`) to workers to fetch. Use to distinguish bugs from design decisions, identify invariants, and calibrate confidence.
@@ -95,13 +108,25 @@ CRITICAL and HIGH are rare. Most findings in production Solidity land at MEDIUM 
 
 ## Parallel Agent Orchestration
 
-### Step 1 — Divide files into 5 groups
+### Step 1 — Divide work into 5 groups
 
-Split in-scope files into up to 5 even groups. If fewer than 5 files, some agents get one file each and the rest are skipped. If only 1 file, assign each agent a severity tier instead (Agent 1: CRITICAL, Agent 2: HIGH, Agent 3: MEDIUM, Agent 4: LOW, Agent 5: cross-file/inheritance checks).
+**Multi-file repos (> 3 files):** Split in-scope files into up to 5 even groups by line count. If fewer than 5 files, some agents get one file each and the rest are skipped.
+
+**Single-file or few-file repos (≤ 3 files):** Split by security concern area. Each agent focuses on a subset of the 65 attack vectors:
+
+| Agent | Concern Area                                                    | Vectors                                                       |
+| ----- | --------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1     | Reentrancy, callbacks, state ordering                           | 3, 9, 18, 27, 30, 40, 57                                      |
+| 2     | Access control, authentication, proxy, upgrades                 | 10, 14, 15, 19, 21, 36, 42, 43, 47, 63                        |
+| 3     | Arithmetic, precision, integer issues, randomness               | 11, 13, 16, 23, 28, 33, 34, 38, 65                            |
+| 4     | Token handling, standards, integration                          | 1, 2, 26, 35, 51–60, 64                                       |
+| 5     | Oracle, flash loan, economic exploits, DoS, general adversarial | 6, 7, 8, 12, 17, 22, 24, 25, 31, 37, 41, 44–46, 48–50, 61, 62 |
+
+Each agent reads the full `attack-vectors.md` but focuses deeply on its assigned vectors. Other vectors are skimmed only for obvious matches.
 
 ### Step 2 — Launch all 5 agents simultaneously
 
-Use the Agent tool to launch all active workers **in a single parallel call** (not sequentially). Each agent is `general-purpose`.
+Use the Agent tool to launch all active workers **in a single parallel call** (not sequentially). Each agent is `general-purpose` with `model: "sonnet"`. Sonnet is fast and capable enough for pattern-matching against attack vectors. The orchestrator (parent model) handles deduplication and report writing.
 
 After launching, print the agent assignment table to the terminal:
 
@@ -115,15 +140,28 @@ After launching, print the agent assignment table to the terminal:
 | ... | ... | ... |
 ```
 
+**Pre-read optimization (≤ 3 in-scope files):** When there are 3 or fewer in-scope files, the orchestrator reads all files before launching agents and passes the file content directly in each agent's prompt (in a `## Source code` section). This eliminates redundant Read calls — 5 agents each reading the same files becomes 1 orchestrator read. For repos with > 3 files, agents read their own assigned files as before.
+
 Pass each a self-contained prompt using this template:
 
 ````
 You are an adversarial Solidity security researcher. Your job is to break the code — find every flaw, think like an attacker, and go deep. Assume nothing is safe until proven otherwise. Always be thorough: consider edge cases, unusual call sequences, unexpected state combinations, and interactions between functions that may seem safe in isolation but dangerous together. Scan the assigned files and return a structured findings list.
 
+[If > 3 in-scope files]:
 **File access:** Use the Read tool to access every file listed below. If a Read call is denied, request permission from the user explicitly — never skip a file, and never ask the orchestrator to read it for you. You must read all files yourself.
 
 ## Assigned files
 [absolute file paths]
+
+[If ≤ 3 in-scope files]:
+**File access:** The source code is provided below. Do NOT use the Read tool for these files — the code is already in this prompt.
+
+## Source code
+[For each in-scope file, include:]
+### [absolute file path]
+```solidity
+[full file content]
+```
 
 ## Read before scanning
 1. [absolute path to references/attack-vectors.md] — 65 vectors, always required
@@ -134,9 +172,9 @@ You are an adversarial Solidity security researcher. Your job is to break the co
 [If assets/findings/ has files]: Read all files in [absolute path]. For each previously reported finding: (1) locate the relevant code in your assigned files; (2) if the vulnerability still exists, include it as a FINDING with "Previously reported — still present" at the start of the Description; (3) if the issue is no longer present, skip it silently.
 [If assets/docs/ has files]: Read all files in [absolute path] — use to understand intended behavior.
 
-## Severity tiers to prioritize
-[file-split agent]: CRITICAL → HIGH → MEDIUM → LOW
-[severity-split agent]: [e.g., CRITICAL only]
+## Focus area
+[file-split agent]: All severity tiers — CRITICAL → HIGH → MEDIUM → LOW
+[concern-split agent]: Focus deeply on vectors [list assigned vector numbers]. Skim remaining vectors only for obvious matches.
 
 ## For each file
 
@@ -145,7 +183,7 @@ You are an adversarial Solidity security researcher. Your job is to break the co
 3. Use the loaded attack vectors as a baseline checklist — work through every vector, check its detection pattern, then its false-positive signals. After completing the checklist, apply general adversarial reasoning: look for logic bugs, trust assumption violations, protocol-specific invariant breaks, and any other issues the vectors do not cover.
 4. For checklist findings: only carry forward if the detection pattern matches AND false-positive conditions do not fully apply. For findings outside the checklist: carry forward if you can write a concrete attack path with a clear impact.
 5. Assign a confidence score (0–100) per the scoring rules in attack-vectors.md. Suppress findings below [active threshold, default 80].
-6. For each finding, draft a code fix (diff format), then re-trace the attack path with the fix applied and verify the vulnerability no longer exists. If the fix does not fully close the attack path, revise it until it does.
+6. For each finding, draft a code fix (diff format). Do NOT self-verify — an independent verification phase handles this.
 7. Apply severity downgrade rules:
    - Privileged caller required (owner, admin, multisig, governance) → drop one level.
    - Impact is self-contained (attacker's own funds only, unreachable state, narrow subset with no spillover) → drop one level.
@@ -169,7 +207,6 @@ Fix:
 + fixed line(s)
 ````
 
-Verification: re-trace the attack path with the fix applied and confirm in one sentence that the vulnerability is resolved
 END_FINDING
 
 SUPPRESSED
@@ -185,6 +222,43 @@ Return ONLY findings and suppressed entries. Do not write a report — the orche
 ### Step 3 — Collect and merge
 
 Wait for all agents. Collect every `FINDING` and `SUPPRESSED` block into one combined list.
+
+### Step 3.5 — Verify findings (Haiku)
+
+For each FINDING from Step 3, launch a parallel Haiku agent (`model: "haiku"`, `subagent_type: "general-purpose"`) to independently verify the issue. Launch all verification agents **in a single parallel call**.
+
+Each Haiku agent receives this prompt:
+
+```
+
+You are a Solidity security verification agent. Verify whether this finding is a real vulnerability.
+
+## Finding
+
+Severity: [severity]
+Location: [location]
+Title: [title]
+Description: [description]
+Fix: [proposed fix]
+
+## Code
+
+```solidity
+[relevant code snippet — include the function and surrounding context, ~50 lines]
+```
+
+## Task
+
+1. Read the code carefully.
+2. Trace the attack path described in the finding. Can it actually be triggered?
+3. Check for mitigations the original agent may have missed (guards, modifiers, access control, state checks).
+4. Return ONLY:
+   - `VERIFIED: [confidence 0-100]` — your independent confidence score
+   - `REASON: [one sentence]` — why you agree or disagree with the finding
+
+```
+
+After all verification agents return, update each finding's confidence score to the **average** of the worker's original score and the verifier's score. If a finding's updated confidence drops below the active threshold, move it to SUPPRESSED with the reason from the verifier.
 
 ### Step 4 — Deduplicate
 
