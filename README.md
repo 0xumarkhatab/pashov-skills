@@ -24,8 +24,8 @@ The skill is then invocable as `/<skill-name>` (e.g., `/solidity-auditor`).
 
 ## Skills
 
-| Skill                  | Description                                                                     |
-| ---------------------- | ------------------------------------------------------------------------------- |
+| Skill                                        | Description                                                                     |
+| -------------------------------------------- | ------------------------------------------------------------------------------- |
 | [solidity-auditor](skills/solidity-auditor/) | Fast (typically <5 min) security feedback on Solidity changes while you develop |
 
 ---
@@ -38,4 +38,6 @@ Report vulnerabilities via [Security Policy](SECURITY.md). This project follows 
 
 ## Contact
 
-For a Pashov Audit Group security engagement, reach out on [Telegram @pashovkrum](https://t.me/pashovkrum).
+If you are looking to explore strategies for securing your project, reach out for a chat on [Telegram @pashovkrum](https://t.me/pashovkrum).
+
+[![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/pashovauditgroup) [![X](https://img.shields.io/badge/X-000000?logo=x&logoColor=white)](https://x.com/PashovAuditGrp) [![Telegram](https://img.shields.io/badge/Telegram-26A5E4?logo=telegram&logoColor=white)](https://t.me/pashovkrum)
