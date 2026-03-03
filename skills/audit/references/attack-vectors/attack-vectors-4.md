@@ -1,6 +1,6 @@
 # Attack Vectors Reference (4/4)
 
-125 total attack vectors. For each: detection pattern and false-positive signals.
+124 total attack vectors. For each: detection pattern and false-positive signals.
 
 ---
 
@@ -157,10 +157,3 @@
 
 - **D:** New UUPS implementation doesn't inherit `UUPSUpgradeable` or removes `upgradeTo`/`upgradeToAndCall`. Proxy permanently loses upgrade capability. Pattern: V2 missing `_authorizeUpgrade` override.
 - **FP:** Every version inherits `UUPSUpgradeable`. Tests verify `upgradeTo` works after each upgrade. OZ upgrades plugin checks in CI.
-
----
-
-**125. Transparent Proxy Admin Routing Confusion**
-
-- **D:** Admin address also used for regular protocol interactions. Calls from admin route to proxy admin functions instead of delegating — silently failing or executing unintended logic.
-- **FP:** Dedicated `ProxyAdmin` contract used exclusively for admin calls. OZ `TransparentUpgradeableProxy` enforces separate admin.

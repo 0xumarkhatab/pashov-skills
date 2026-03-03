@@ -17,7 +17,7 @@ Confidence measures certainty that the finding is real and exploitable — not h
 **Deductions (apply all that fit):**
 
 - Privileged caller required (owner, admin, multisig, governance) → **-25**.
-- Attack path is partial (general idea is sound but cannot write exact caller → call → state change → outcome) → **-25**.
+- Attack path is partial (general idea is sound but cannot write exact caller → call → state change → outcome) → **-20**.
 - Impact is self-contained (only affects the attacker's own funds, no spillover to other users) → **-15**.
 
 Confidence indicator: `[score]` (e.g., `[95]`, `[75]`, `[60]`).

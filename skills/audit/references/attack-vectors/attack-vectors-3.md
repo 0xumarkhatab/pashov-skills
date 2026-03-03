@@ -1,6 +1,6 @@
 # Attack Vectors Reference (3/4)
 
-125 total attack vectors. For each: detection pattern and false-positive signals.
+124 total attack vectors. For each: detection pattern and false-positive signals.
 
 ---
 

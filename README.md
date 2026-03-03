@@ -12,7 +12,8 @@
 Works with Claude Code in **VS Code**, **Cursor**, and the terminal. Clone this repo, then copy any skill folder into Claude Code's commands directory:
 
 ```bash
-cp -r skills/<skill-name> ~/.claude/commands/
+git clone https://github.com/pashov/skills.git
+cp -r skills/<skill-name> ~/.claude/commands/<skill-name>
 ```
 
 The skill is then invocable as `/<skill-name>` (e.g., `/audit`).

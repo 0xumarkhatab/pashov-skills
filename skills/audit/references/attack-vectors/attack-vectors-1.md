@@ -1,6 +1,6 @@
 # Attack Vectors Reference (1/4)
 
-125 total attack vectors. For each: detection pattern and false-positive signals.
+124 total attack vectors. For each: detection pattern and false-positive signals.
 
 ---
 
@@ -24,10 +24,10 @@
 - **D:** `(bool success, bytes memory data) = target.call(payload)` where `target` is user-supplied. Malicious target returns huge returndata; copying costs enormous gas.
 - **FP:** Returndata not copied (assembly call without copy, or gas-limited). Callee is hardcoded trusted contract.
 
-**5. Missing Storage Gap in Upgradeable Base Contract**
+**5. Transparent Proxy Admin Routing Confusion**
 
-- **D:** Inherited upgradeable base has no `uint256[N] private __gap;`. Adding state variables in a future version shifts all derived contracts' storage slots.
-- **FP:** EIP-7201 / EIP-1967 namespaced storage used. `__gap` present and correctly sized. Single non-inherited contract.
+- **D:** Admin address also used for regular protocol interactions. Calls from admin route to proxy admin functions instead of delegating — silently failing or executing unintended logic.
+- **FP:** Dedicated `ProxyAdmin` contract used exclusively for admin calls. OZ `TransparentUpgradeableProxy` enforces separate admin.
 
 **6. ERC4626 Mint/Redeem Asset-Cost Asymmetry**
 
