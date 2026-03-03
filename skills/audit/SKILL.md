@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Fast, focused security feedback on Solidity code while you develop - before you commit, not after an auditor does. Built for developers. Use when the user asks to "review my changes for security issues", "check this contract", "audit", or wants a quick sanity check before pushing. Supports modes - default (full repo), DIFF (git-changed files only), DEEP (full repo + adversarial reasoning), or a specific filename.
+description: Security review of Solidity code while you develop. Trigger on "audit", "check this contract", "review for security". Modes - default (full repo), DIFF (changed files), DEEP (+ adversarial reasoning), or a specific filename.
 ---
 
 # Smart Contract Security Review
@@ -20,7 +20,7 @@ You are the orchestrator of a parallelized smart contract security review. Your 
 
 - `--file-output` (off by default): also write the report to a markdown file (path per `{resolved_path}/report-formatting.md`). Without this flag, output goes to the terminal only. Never write a report file unless the user explicitly passes `--file-output`.
 
-## Orchestration (4 turns)
+## Orchestration
 
 **Turn 1 — Discover.** Print the banner, then in the same message make parallel tool calls: (a) Bash `find` for in-scope `.sol` files per mode selection, (b) Glob for `**/references/attack-vectors/attack-vectors-1.md` and extract the `references/` directory path (two levels up). Use this resolved path as `{resolved_path}` for all subsequent references.
 
@@ -31,9 +31,7 @@ You are the orchestrator of a parallelized smart contract security review. Your 
 - **Agents 1–4** (vector scanning) — spawn with `model: "sonnet"`. Each agent prompt must contain the full text of `vector-scan-agent.md` (read in Turn 2, paste into every prompt). After the instructions, add: `Your bundle file is /tmp/audit-agent-N-bundle.md (XXXX lines).` (substitute the real line count).
 - **Agent 5** (adversarial reasoning, DEEP only) — spawn with `model: "opus"`. Receives the in-scope `.sol` file paths and the instruction: your reference directory is `{resolved_path}`. Read `{resolved_path}/agents/adversarial-reasoning-agent.md` for your full instructions.
 
-**Turn 4 — Report.** Merge all agent results: deduplicate by root cause (keep the higher-confidence version), sort by confidence highest-first, re-number sequentially, and insert the **Below Confidence Threshold** separator row. Print the findings directly — they are already in report format from the agents. Do not re-draft or re-describe findings. Use the report-formatting.md (read in Turn 2) for the scope table and output structure.
-
-If `--file-output` is set, use the Write tool directly to write the complete report to a file (path per `{resolved_path}/report-formatting.md`) in a single call. Print the file path when done.
+**Turn 4 — Report.** Merge all agent results: deduplicate by root cause (keep the higher-confidence version), sort by confidence highest-first, re-number sequentially, and insert the **Below Confidence Threshold** separator row. Print findings directly — do not re-draft or re-describe them. Use report-formatting.md (read in Turn 2) for the scope table and output structure. If `--file-output` is set, write the report to a file (path per report-formatting.md) and print the path.
 
 ## Banner
 
